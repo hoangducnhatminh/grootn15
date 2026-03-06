@@ -1,0 +1,554 @@
+[
+    {
+        "config": {
+            "inference_mode": "tensorrt",
+            "vit_dtype": "fp16",
+            "llm_dtype": "fp16",
+            "dit_dtype": "fp16",
+            "model_path": "/home/minh/Workspace/projects/IsaacLabEvalTasks/submodules/Isaac-GR00T/output_generated_dataset_annotated_gr1_standard_r0",
+            "calibration_size": 10,
+            "denoising_steps": 4
+        },
+        "resources": {
+            "total_vram_required_gb": 11.189453125,
+            "trt_workspace_gb": 5.387452602386475,
+            "pytorch_vram_gb": 5.802000522613525,
+            "peak_ram_gb": 7.995277404785156
+        },
+        "performance": {
+            "inference_time_ms": 16.341467066862002
+        },
+        "accuracy": {
+            "action.left_arm": {
+                "cosine_similarity": 0.999999362230301,
+                "max_difference": 0.006481528282165527,
+                "min_difference": 0.0,
+                "mean_difference": 0.0006876046885736286
+            },
+            "action.right_arm": {
+                "cosine_similarity": 0.9999983131885528,
+                "max_difference": 0.007530927658081055,
+                "min_difference": 0.0,
+                "mean_difference": 0.0009094611508771777
+            },
+            "action.left_hand": {
+                "cosine_similarity": 0.9999987781047821,
+                "max_difference": 0.0034067630767822266,
+                "min_difference": 0.0,
+                "mean_difference": 0.0007786554051563144
+            },
+            "action.right_hand": {
+                "cosine_similarity": 0.9999997198581696,
+                "max_difference": 0.0024853944778442383,
+                "min_difference": 0.0,
+                "mean_difference": 0.0004935938864946366
+            }
+        }
+    },
+    {
+        "config": {
+            "inference_mode": "tensorrt",
+            "vit_dtype": "fp16",
+            "llm_dtype": "fp16",
+            "dit_dtype": "fp8",
+            "model_path": "/home/minh/Workspace/projects/IsaacLabEvalTasks/submodules/Isaac-GR00T/output_generated_dataset_annotated_gr1_standard_r0",
+            "calibration_size": 10,
+            "denoising_steps": 4
+        },
+        "resources": {
+            "total_vram_required_gb": 10.65625,
+            "trt_workspace_gb": 4.854249477386475,
+            "pytorch_vram_gb": 5.802000522613525,
+            "peak_ram_gb": 8.035717010498047
+        },
+        "performance": {
+            "inference_time_ms": 14.735798000037903
+        },
+        "accuracy": {
+            "action.left_arm": {
+                "cosine_similarity": 0.9999894380569458,
+                "max_difference": 0.026984810829162598,
+                "min_difference": 0.0,
+                "mean_difference": 0.002733511000405997
+            },
+            "action.right_arm": {
+                "cosine_similarity": 0.9999812841415405,
+                "max_difference": 0.0209195613861084,
+                "min_difference": 0.0,
+                "mean_difference": 0.0030050165951251984
+            },
+            "action.left_hand": {
+                "cosine_similarity": 0.9999777853488923,
+                "max_difference": 0.01928490400314331,
+                "min_difference": 0.0,
+                "mean_difference": 0.003820128203369677
+            },
+            "action.right_hand": {
+                "cosine_similarity": 0.9999941468238831,
+                "max_difference": 0.0175439715385437,
+                "min_difference": 0.0,
+                "mean_difference": 0.0019550303695723414
+            }
+        }
+    },
+    {
+        "config": {
+            "inference_mode": "tensorrt",
+            "vit_dtype": "fp16",
+            "llm_dtype": "nvfp4",
+            "dit_dtype": "fp16",
+            "model_path": "/home/minh/Workspace/projects/IsaacLabEvalTasks/submodules/Isaac-GR00T/output_generated_dataset_annotated_gr1_standard_r0",
+            "calibration_size": 10,
+            "denoising_steps": 4
+        },
+        "resources": {
+            "total_vram_required_gb": 10.458984375,
+            "trt_workspace_gb": 4.656983852386475,
+            "pytorch_vram_gb": 5.802000522613525,
+            "peak_ram_gb": 8.537551879882812
+        },
+        "performance": {
+            "inference_time_ms": 14.956959900155198
+        },
+        "accuracy": {
+            "action.left_arm": {
+                "cosine_similarity": 0.9999899566173553,
+                "max_difference": 0.027310609817504883,
+                "min_difference": 0.0,
+                "mean_difference": 0.0027856229338794948
+            },
+            "action.right_arm": {
+                "cosine_similarity": 0.9999894440174103,
+                "max_difference": 0.015171527862548828,
+                "min_difference": 0.0,
+                "mean_difference": 0.002172137750312686
+            },
+            "action.left_hand": {
+                "cosine_similarity": 0.9999930381774902,
+                "max_difference": 0.021923363208770752,
+                "min_difference": 0.0,
+                "mean_difference": 0.0015813578676898033
+            },
+            "action.right_hand": {
+                "cosine_similarity": 0.9999980092048645,
+                "max_difference": 0.012280821800231934,
+                "min_difference": 0.0,
+                "mean_difference": 0.0011330726905725897
+            }
+        }
+    },
+    {
+        "config": {
+            "inference_mode": "tensorrt",
+            "vit_dtype": "fp16",
+            "llm_dtype": "nvfp4",
+            "dit_dtype": "fp8",
+            "model_path": "/home/minh/Workspace/projects/IsaacLabEvalTasks/submodules/Isaac-GR00T/output_generated_dataset_annotated_gr1_standard_r0",
+            "calibration_size": 10,
+            "denoising_steps": 4
+        },
+        "resources": {
+            "total_vram_required_gb": 9.95703125,
+            "trt_workspace_gb": 4.155030727386475,
+            "pytorch_vram_gb": 5.802000522613525,
+            "peak_ram_gb": 8.509220123291016
+        },
+        "performance": {
+            "inference_time_ms": 13.55055263338727
+        },
+        "accuracy": {
+            "action.left_arm": {
+                "cosine_similarity": 0.9999741375446319,
+                "max_difference": 0.03464055061340332,
+                "min_difference": 0.0,
+                "mean_difference": 0.004385000327602029
+            },
+            "action.right_arm": {
+                "cosine_similarity": 0.9999736547470093,
+                "max_difference": 0.026612043380737305,
+                "min_difference": 0.0,
+                "mean_difference": 0.003508274047635496
+            },
+            "action.left_hand": {
+                "cosine_similarity": 0.9999722599983215,
+                "max_difference": 0.03199756145477295,
+                "min_difference": 0.0,
+                "mean_difference": 0.0041416976135224106
+            },
+            "action.right_hand": {
+                "cosine_similarity": 0.9999918103218078,
+                "max_difference": 0.019824683666229248,
+                "min_difference": 0.0,
+                "mean_difference": 0.0023685275693424044
+            }
+        }
+    },
+    {
+        "config": {
+            "inference_mode": "tensorrt",
+            "vit_dtype": "fp16",
+            "llm_dtype": "fp8",
+            "dit_dtype": "fp16",
+            "model_path": "/home/minh/Workspace/projects/IsaacLabEvalTasks/submodules/Isaac-GR00T/output_generated_dataset_annotated_gr1_standard_r0",
+            "calibration_size": 10,
+            "denoising_steps": 4
+        },
+        "resources": {
+            "total_vram_required_gb": 10.56640625,
+            "trt_workspace_gb": 4.764405727386475,
+            "pytorch_vram_gb": 5.802000522613525,
+            "peak_ram_gb": 8.081722259521484
+        },
+        "performance": {
+            "inference_time_ms": 15.612013033144951
+        },
+        "accuracy": {
+            "action.left_arm": {
+                "cosine_similarity": 0.999997341632843,
+                "max_difference": 0.018894851207733154,
+                "min_difference": 0.0,
+                "mean_difference": 0.0013631491048727185
+            },
+            "action.right_arm": {
+                "cosine_similarity": 0.9999966323375702,
+                "max_difference": 0.012551665306091309,
+                "min_difference": 0.0,
+                "mean_difference": 0.0012321300338953734
+            },
+            "action.left_hand": {
+                "cosine_similarity": 0.999997341632843,
+                "max_difference": 0.0101701021194458,
+                "min_difference": 0.0,
+                "mean_difference": 0.0011174619663506745
+            },
+            "action.right_hand": {
+                "cosine_similarity": 0.9999992668628692,
+                "max_difference": 0.006973743438720703,
+                "min_difference": 0.0,
+                "mean_difference": 0.0006975260854233057
+            }
+        }
+    },
+    {
+        "config": {
+            "inference_mode": "tensorrt",
+            "vit_dtype": "fp16",
+            "llm_dtype": "fp8",
+            "dit_dtype": "fp8",
+            "model_path": "/home/minh/Workspace/projects/IsaacLabEvalTasks/submodules/Isaac-GR00T/output_generated_dataset_annotated_gr1_standard_r0",
+            "calibration_size": 10,
+            "denoising_steps": 4
+        },
+        "resources": {
+            "total_vram_required_gb": 10.033203125,
+            "trt_workspace_gb": 4.231202602386475,
+            "pytorch_vram_gb": 5.802000522613525,
+            "peak_ram_gb": 8.66054916381836
+        },
+        "performance": {
+            "inference_time_ms": 14.037753566663014
+        },
+        "accuracy": {
+            "action.left_arm": {
+                "cosine_similarity": 0.9999857425689698,
+                "max_difference": 0.03083980083465576,
+                "min_difference": 0.0,
+                "mean_difference": 0.003116043866612017
+            },
+            "action.right_arm": {
+                "cosine_similarity": 0.9999787092208863,
+                "max_difference": 0.024871110916137695,
+                "min_difference": 0.0,
+                "mean_difference": 0.0030509223695844414
+            },
+            "action.left_hand": {
+                "cosine_similarity": 0.9999723434448242,
+                "max_difference": 0.023650407791137695,
+                "min_difference": 0.0,
+                "mean_difference": 0.004266442568041384
+            },
+            "action.right_hand": {
+                "cosine_similarity": 0.9999934017658234,
+                "max_difference": 0.01736849546432495,
+                "min_difference": 0.0,
+                "mean_difference": 0.0020257755531929433
+            }
+        }
+    },
+    {
+        "config": {
+            "inference_mode": "tensorrt",
+            "vit_dtype": "fp8",
+            "llm_dtype": "fp16",
+            "dit_dtype": "fp16",
+            "model_path": "/home/minh/Workspace/projects/IsaacLabEvalTasks/submodules/Isaac-GR00T/output_generated_dataset_annotated_gr1_standard_r0",
+            "calibration_size": 10,
+            "denoising_steps": 4
+        },
+        "resources": {
+            "total_vram_required_gb": 10.796875,
+            "trt_workspace_gb": 4.994874477386475,
+            "pytorch_vram_gb": 5.802000522613525,
+            "peak_ram_gb": 7.995574951171875
+        },
+        "performance": {
+            "inference_time_ms": 15.88435526646208
+        },
+        "accuracy": {
+            "action.left_arm": {
+                "cosine_similarity": 0.9999947309494018,
+                "max_difference": 0.016723036766052246,
+                "min_difference": 0.0,
+                "mean_difference": 0.002098112879320979
+            },
+            "action.right_arm": {
+                "cosine_similarity": 0.9999963462352752,
+                "max_difference": 0.007834434509277344,
+                "min_difference": 0.0,
+                "mean_difference": 0.0014611648861318828
+            },
+            "action.left_hand": {
+                "cosine_similarity": 0.9999981820583344,
+                "max_difference": 0.004605412483215332,
+                "min_difference": 0.0,
+                "mean_difference": 0.001007569272769615
+            },
+            "action.right_hand": {
+                "cosine_similarity": 0.999999362230301,
+                "max_difference": 0.0036842823028564453,
+                "min_difference": 0.0,
+                "mean_difference": 0.0007663091062568128
+            }
+        }
+    },
+    {
+        "config": {
+            "inference_mode": "tensorrt",
+            "vit_dtype": "fp8",
+            "llm_dtype": "fp16",
+            "dit_dtype": "fp8",
+            "model_path": "/home/minh/Workspace/projects/IsaacLabEvalTasks/submodules/Isaac-GR00T/output_generated_dataset_annotated_gr1_standard_r0",
+            "calibration_size": 10,
+            "denoising_steps": 4
+        },
+        "resources": {
+            "total_vram_required_gb": 10.294921875,
+            "trt_workspace_gb": 4.492921352386475,
+            "pytorch_vram_gb": 5.802000522613525,
+            "peak_ram_gb": 8.634227752685547
+        },
+        "performance": {
+            "inference_time_ms": 14.9192551667511
+        },
+        "accuracy": {
+            "action.left_arm": {
+                "cosine_similarity": 0.9999844074249268,
+                "max_difference": 0.02703911066055298,
+                "min_difference": 0.0,
+                "mean_difference": 0.003603779966942966
+            },
+            "action.right_arm": {
+                "cosine_similarity": 0.9999780237674714,
+                "max_difference": 0.02342987060546875,
+                "min_difference": 0.0,
+                "mean_difference": 0.003400355996564031
+            },
+            "action.left_hand": {
+                "cosine_similarity": 0.9999762177467346,
+                "max_difference": 0.01861327886581421,
+                "min_difference": 0.0,
+                "mean_difference": 0.003962714760564268
+            },
+            "action.right_hand": {
+                "cosine_similarity": 0.9999933063983917,
+                "max_difference": 0.015789568424224854,
+                "min_difference": 0.0,
+                "mean_difference": 0.0021251610480248926
+            }
+        }
+    },
+    {
+        "config": {
+            "inference_mode": "tensorrt",
+            "vit_dtype": "fp8",
+            "llm_dtype": "nvfp4",
+            "dit_dtype": "fp16",
+            "model_path": "/home/minh/Workspace/projects/IsaacLabEvalTasks/submodules/Isaac-GR00T/output_generated_dataset_annotated_gr1_standard_r0",
+            "calibration_size": 10,
+            "denoising_steps": 4
+        },
+        "resources": {
+            "total_vram_required_gb": 10.09765625,
+            "trt_workspace_gb": 4.295655727386475,
+            "pytorch_vram_gb": 5.802000522613525,
+            "peak_ram_gb": 8.187992095947266
+        },
+        "performance": {
+            "inference_time_ms": 14.427538099941255
+        },
+        "accuracy": {
+            "action.left_arm": {
+                "cosine_similarity": 0.9999877274036407,
+                "max_difference": 0.02927035093307495,
+                "min_difference": 0.0,
+                "mean_difference": 0.0029381667845882475
+            },
+            "action.right_arm": {
+                "cosine_similarity": 0.9999913394451141,
+                "max_difference": 0.016735553741455078,
+                "min_difference": 0.0,
+                "mean_difference": 0.0019568993244320153
+            },
+            "action.left_hand": {
+                "cosine_similarity": 0.9999919235706329,
+                "max_difference": 0.020100414752960205,
+                "min_difference": 0.0,
+                "mean_difference": 0.0018210837093647569
+            },
+            "action.right_hand": {
+                "cosine_similarity": 0.9999974966049194,
+                "max_difference": 0.013508856296539307,
+                "min_difference": 0.0,
+                "mean_difference": 0.001341688196407631
+            }
+        }
+    },
+    {
+        "config": {
+            "inference_mode": "tensorrt",
+            "vit_dtype": "fp8",
+            "llm_dtype": "nvfp4",
+            "dit_dtype": "fp8",
+            "model_path": "/home/minh/Workspace/projects/IsaacLabEvalTasks/submodules/Isaac-GR00T/output_generated_dataset_annotated_gr1_standard_r0",
+            "calibration_size": 10,
+            "denoising_steps": 4
+        },
+        "resources": {
+            "total_vram_required_gb": 9.595703125,
+            "trt_workspace_gb": 3.7937026023864746,
+            "pytorch_vram_gb": 5.802000522613525,
+            "peak_ram_gb": 8.073883056640625
+        },
+        "performance": {
+            "inference_time_ms": 13.590449499800647
+        },
+        "accuracy": {
+            "action.left_arm": {
+                "cosine_similarity": 0.9999717473983765,
+                "max_difference": 0.04276275634765625,
+                "min_difference": 0.0,
+                "mean_difference": 0.004534801840782166
+            },
+            "action.right_arm": {
+                "cosine_similarity": 0.9999745428562165,
+                "max_difference": 0.025103330612182617,
+                "min_difference": 0.0,
+                "mean_difference": 0.0034640291705727577
+            },
+            "action.left_hand": {
+                "cosine_similarity": 0.9999696910381317,
+                "max_difference": 0.030222654342651367,
+                "min_difference": 0.0,
+                "mean_difference": 0.004221207974478602
+            },
+            "action.right_hand": {
+                "cosine_similarity": 0.9999911606311798,
+                "max_difference": 0.019473791122436523,
+                "min_difference": 0.0,
+                "mean_difference": 0.0025090344483032823
+            }
+        }
+    },
+    {
+        "config": {
+            "inference_mode": "tensorrt",
+            "vit_dtype": "fp8",
+            "llm_dtype": "fp8",
+            "dit_dtype": "fp16",
+            "model_path": "/home/minh/Workspace/projects/IsaacLabEvalTasks/submodules/Isaac-GR00T/output_generated_dataset_annotated_gr1_standard_r0",
+            "calibration_size": 10,
+            "denoising_steps": 4
+        },
+        "resources": {
+            "total_vram_required_gb": 10.173828125,
+            "trt_workspace_gb": 4.371827602386475,
+            "pytorch_vram_gb": 5.802000522613525,
+            "peak_ram_gb": 8.03369140625
+        },
+        "performance": {
+            "inference_time_ms": 15.718633033247897
+        },
+        "accuracy": {
+            "action.left_arm": {
+                "cosine_similarity": 0.999993896484375,
+                "max_difference": 0.01984328031539917,
+                "min_difference": 0.0,
+                "mean_difference": 0.0022685307660140095
+            },
+            "action.right_arm": {
+                "cosine_similarity": 0.9999949991703033,
+                "max_difference": 0.014225244522094727,
+                "min_difference": 0.0,
+                "mean_difference": 0.0016491707996465267
+            },
+            "action.left_hand": {
+                "cosine_similarity": 0.9999961376190185,
+                "max_difference": 0.010937690734863281,
+                "min_difference": 0.0,
+                "mean_difference": 0.0013585679873358459
+            },
+            "action.right_hand": {
+                "cosine_similarity": 0.999998790025711,
+                "max_difference": 0.008464992046356201,
+                "min_difference": 0.0,
+                "mean_difference": 0.0009548277303110808
+            }
+        }
+    },
+    {
+        "config": {
+            "inference_mode": "tensorrt",
+            "vit_dtype": "fp8",
+            "llm_dtype": "fp8",
+            "dit_dtype": "fp8",
+            "model_path": "/home/minh/Workspace/projects/IsaacLabEvalTasks/submodules/Isaac-GR00T/output_generated_dataset_annotated_gr1_standard_r0",
+            "calibration_size": 10,
+            "denoising_steps": 4
+        },
+        "resources": {
+            "total_vram_required_gb": 9.671875,
+            "trt_workspace_gb": 3.8698744773864746,
+            "pytorch_vram_gb": 5.802000522613525,
+            "peak_ram_gb": 8.308330535888672
+        },
+        "performance": {
+            "inference_time_ms": 14.043401133433994
+        },
+        "accuracy": {
+            "action.left_arm": {
+                "cosine_similarity": 0.9999821007251739,
+                "max_difference": 0.03029686212539673,
+                "min_difference": 0.0,
+                "mean_difference": 0.0036933356896042824
+            },
+            "action.right_arm": {
+                "cosine_similarity": 0.9999775111675262,
+                "max_difference": 0.02350330352783203,
+                "min_difference": 0.0,
+                "mean_difference": 0.0033607297809794545
+            },
+            "action.left_hand": {
+                "cosine_similarity": 0.9999718964099884,
+                "max_difference": 0.02235513925552368,
+                "min_difference": 0.0,
+                "mean_difference": 0.004340554564259946
+            },
+            "action.right_hand": {
+                "cosine_similarity": 0.9999926805496215,
+                "max_difference": 0.017675578594207764,
+                "min_difference": 0.0,
+                "mean_difference": 0.0021637464524246752
+            }
+        }
+    }
+]

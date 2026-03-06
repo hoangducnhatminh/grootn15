@@ -168,6 +168,28 @@ class Gr00tN1ClosedLoopArguments:
     rollout_length: int = field(default=30, metadata={"description": "Number of steps in each rollout episode."})
     seed: int = field(default=10, metadata={"description": "Random seed for reproducibility."})
 
+    # TensorRT inference parameters
+    inference_mode: str = field(
+        default="pytorch",
+        metadata={"description": "Inference mode for the policy ('pytorch' or 'tensorrt')."},
+    )
+    trt_engine_path: str = field(
+        default="gr00t_engine",
+        metadata={"description": "Path to the directory containing TensorRT engine files."},
+    )
+    vit_dtype: str = field(
+        default="fp8",
+        metadata={"description": "Data type for the ViT model in TensorRT (e.g., 'fp16', 'fp8')."},
+    )
+    llm_dtype: str = field(
+        default="nvfp4",
+        metadata={"description": "Data type for the LLM model in TensorRT (e.g., 'fp16', 'nvfp4', 'fp8')."},
+    )
+    dit_dtype: str = field(
+        default="fp8",
+        metadata={"description": "Data type for the DiT model in TensorRT (e.g., 'fp16', 'fp8')."},
+    )
+
     def __post_init__(self):
         # Populate fields from enum based on task_name
         # if self.task_name.upper() not in EvalTaskConfig.__members__:

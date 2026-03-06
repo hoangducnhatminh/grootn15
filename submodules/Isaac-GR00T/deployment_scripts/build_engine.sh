@@ -1,25 +1,15 @@
+#!/bin/bash
 # SPDX-FileCopyrightText: Copyright (c) 2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 
-#!/bin/bash
+# The build_engine.sh script converts ONNX models to TensorRT Engines.
+
 echo "Important Notes:"
 echo "1: The max batch of engine size is set to 8 in the reference case. "
 echo "2: The MIN_LEN/OPT_LEN/MAX_LEN for LLM, DiT, VLLN-VLSelfAttention models is set to 80/296/300."
 echo "If your inference batch size exceeds 8 or the MIN_LEN/OPT_LEN/MAX_LEN for LLM, DiT, VLLN-VLSelfAttention not fit your use case, please set it to your actual batch size and length variables."
 
-export PATH=/usr/src/tensorrt/bin:$PATH
+export PATH=/usr/src/tensorrt/bin:$PATH # It adds /usr/src/tensorrt/bin to the system PATH so it can find the trtexec tool
 
 VIDEO_VIEWS=${VIDEO_VIEWS:-1}   # Options: 1 (default), 2
 # Define length variables
@@ -31,8 +21,8 @@ if [ "$VIDEO_VIEWS" = "2" ]; then
     MAX_LEN=600
 else   # one video view (default)
     MIN_LEN=80
-    OPT_LEN=296
-    MAX_LEN=300
+    OPT_LEN=400
+    MAX_LEN=512
 fi
 
 # Define precision settings (can be overridden via environment variables)

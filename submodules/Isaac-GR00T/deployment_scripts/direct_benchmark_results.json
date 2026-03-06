@@ -1,0 +1,260 @@
+[
+    {
+        "config": {
+            "vit": "fp16",
+            "llm": "fp16",
+            "dit": "fp16",
+            "inference_mode": "direct_tensorrt",
+            "calibration_size": 10
+        },
+        "resources": {
+            "total_vram_required_gb": 6.492,
+            "gpu_global_peak_gb": 28.032,
+            "trt_workspace_gb": 5.331,
+            "pytorch_vram_gb": 1.162,
+            "other_vram_gb": 26.287,
+            "max_ram_gb": 1.955
+        },
+        "performance": {
+            "latency_ms": 12.45,
+            "latency_std_ms": 0.0
+        },
+        "accuracy": {
+            "action.left_arm": {
+                "cosine_similarity": 0.9999992907047272,
+                "max_difference": 0.006022155284881592,
+                "mean_difference": 0.0007466905226465315
+            },
+            "action.right_arm": {
+                "cosine_similarity": 0.9999979436397552,
+                "max_difference": 0.006898641586303711,
+                "mean_difference": 0.0010269307356793433
+            },
+            "action.left_hand": {
+                "cosine_similarity": 0.9999986231327057,
+                "max_difference": 0.004208922386169434,
+                "mean_difference": 0.0008416511176619679
+            },
+            "action.right_hand": {
+                "cosine_similarity": 0.9999996483325958,
+                "max_difference": 0.002244234085083008,
+                "mean_difference": 0.0005768986535258591
+            }
+        }
+    },
+    {
+        "config": {
+            "vit": "fp16",
+            "llm": "fp16",
+            "dit": "fp8",
+            "inference_mode": "direct_tensorrt",
+            "calibration_size": 10
+        },
+        "resources": {
+            "total_vram_required_gb": 5.959,
+            "gpu_global_peak_gb": 28.029,
+            "trt_workspace_gb": 4.797,
+            "pytorch_vram_gb": 1.162,
+            "other_vram_gb": 26.287,
+            "max_ram_gb": 1.945
+        },
+        "performance": {
+            "latency_ms": 11.36,
+            "latency_std_ms": 0.0
+        },
+        "accuracy": {
+            "action.left_arm": {
+                "cosine_similarity": 0.9999885201454163,
+                "max_difference": 0.030627310276031494,
+                "mean_difference": 0.0027888775570318104
+            },
+            "action.right_arm": {
+                "cosine_similarity": 0.9999786794185639,
+                "max_difference": 0.021857261657714844,
+                "mean_difference": 0.0032518325839191674
+            },
+            "action.left_hand": {
+                "cosine_similarity": 0.9999767661094665,
+                "max_difference": 0.019509315490722656,
+                "mean_difference": 0.0039205871056765314
+            },
+            "action.right_hand": {
+                "cosine_similarity": 0.9999938607215881,
+                "max_difference": 0.017942368984222412,
+                "mean_difference": 0.0020286011626012624
+            }
+        }
+    },
+    {
+        "config": {
+            "vit": "fp16",
+            "llm": "fp8",
+            "dit": "fp16",
+            "inference_mode": "direct_tensorrt",
+            "calibration_size": 10
+        },
+        "resources": {
+            "total_vram_required_gb": 5.869,
+            "gpu_global_peak_gb": 28.064,
+            "trt_workspace_gb": 4.708,
+            "pytorch_vram_gb": 1.162,
+            "other_vram_gb": 26.287,
+            "max_ram_gb": 1.959
+        },
+        "performance": {
+            "latency_ms": 12.7,
+            "latency_std_ms": 0.0
+        },
+        "accuracy": {
+            "action.left_arm": {
+                "cosine_similarity": 0.9999978482723236,
+                "max_difference": 0.012541115283966064,
+                "mean_difference": 0.0013570847338996827
+            },
+            "action.right_arm": {
+                "cosine_similarity": 0.9999961972236633,
+                "max_difference": 0.01097726821899414,
+                "mean_difference": 0.0012591979873832315
+            },
+            "action.left_hand": {
+                "cosine_similarity": 0.9999971628189087,
+                "max_difference": 0.008602738380432129,
+                "mean_difference": 0.0012059068831149489
+            },
+            "action.right_hand": {
+                "cosine_similarity": 0.9999991893768311,
+                "max_difference": 0.006379485130310059,
+                "mean_difference": 0.0007943605945911258
+            }
+        }
+    },
+    {
+        "config": {
+            "vit": "fp16",
+            "llm": "fp8",
+            "dit": "fp8",
+            "inference_mode": "direct_tensorrt",
+            "calibration_size": 10
+        },
+        "resources": {
+            "total_vram_required_gb": 5.336,
+            "gpu_global_peak_gb": 28.061,
+            "trt_workspace_gb": 4.174,
+            "pytorch_vram_gb": 1.162,
+            "other_vram_gb": 26.287,
+            "max_ram_gb": 1.949
+        },
+        "performance": {
+            "latency_ms": 11.26,
+            "latency_std_ms": 0.0
+        },
+        "accuracy": {
+            "action.left_arm": {
+                "cosine_similarity": 0.9999863743782044,
+                "max_difference": 0.029061555862426758,
+                "mean_difference": 0.003127004229463637
+            },
+            "action.right_arm": {
+                "cosine_similarity": 0.9999766826629639,
+                "max_difference": 0.024135589599609375,
+                "mean_difference": 0.003188981837593019
+            },
+            "action.left_hand": {
+                "cosine_similarity": 0.9999714434146881,
+                "max_difference": 0.02325117588043213,
+                "mean_difference": 0.004411638295277953
+            },
+            "action.right_hand": {
+                "cosine_similarity": 0.9999931514263153,
+                "max_difference": 0.017942368984222412,
+                "mean_difference": 0.0020761754829436542
+            }
+        }
+    },
+    {
+        "config": {
+            "vit": "fp16",
+            "llm": "nvfp4",
+            "dit": "fp16",
+            "inference_mode": "direct_tensorrt",
+            "calibration_size": 10
+        },
+        "resources": {
+            "total_vram_required_gb": 5.762,
+            "gpu_global_peak_gb": 28.117,
+            "trt_workspace_gb": 4.6,
+            "pytorch_vram_gb": 1.162,
+            "other_vram_gb": 26.287,
+            "max_ram_gb": 2.014
+        },
+        "performance": {
+            "latency_ms": 11.94,
+            "latency_std_ms": 0.0
+        },
+        "accuracy": {
+            "action.left_arm": {
+                "cosine_similarity": 0.9999898850917817,
+                "max_difference": 0.025198400020599365,
+                "mean_difference": 0.002696301252581179
+            },
+            "action.right_arm": {
+                "cosine_similarity": 0.9999892055988312,
+                "max_difference": 0.018276214599609375,
+                "mean_difference": 0.0020717461360618473
+            },
+            "action.left_hand": {
+                "cosine_similarity": 0.9999917805194855,
+                "max_difference": 0.023698747158050537,
+                "mean_difference": 0.0016713991644792259
+            },
+            "action.right_hand": {
+                "cosine_similarity": 0.9999977827072144,
+                "max_difference": 0.013703703880310059,
+                "mean_difference": 0.001220931060379371
+            }
+        }
+    },
+    {
+        "config": {
+            "vit": "fp16",
+            "llm": "nvfp4",
+            "dit": "fp8",
+            "inference_mode": "direct_tensorrt",
+            "calibration_size": 10
+        },
+        "resources": {
+            "total_vram_required_gb": 5.26,
+            "gpu_global_peak_gb": 28.127,
+            "trt_workspace_gb": 4.098,
+            "pytorch_vram_gb": 1.162,
+            "other_vram_gb": 26.287,
+            "max_ram_gb": 2.007
+        },
+        "performance": {
+            "latency_ms": 10.71,
+            "latency_std_ms": 0.0
+        },
+        "accuracy": {
+            "action.left_arm": {
+                "cosine_similarity": 0.999975609779358,
+                "max_difference": 0.03428804874420166,
+                "mean_difference": 0.004250844451598823
+            },
+            "action.right_arm": {
+                "cosine_similarity": 0.9999740898609162,
+                "max_difference": 0.026088714599609375,
+                "mean_difference": 0.0034535462968051434
+            },
+            "action.left_hand": {
+                "cosine_similarity": 0.9999707162380218,
+                "max_difference": 0.030534684658050537,
+                "mean_difference": 0.0042160784592852
+            },
+            "action.right_hand": {
+                "cosine_similarity": 0.999992060661316,
+                "max_difference": 0.019005894660949707,
+                "mean_difference": 0.0024279863573610783
+            }
+        }
+    }
+]

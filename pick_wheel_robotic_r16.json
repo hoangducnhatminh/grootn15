@@ -1,0 +1,12 @@
+{
+    "metadata": {
+        "checkpoint_name": "gr00t-n1-2b-tuned",
+        "seed": 10,
+        "date": "2026-03-06 11:15:49"
+    },
+    "summary": {
+        "successful_trials": 91,
+        "total_rollouts": 100,
+        "success_rate": 0.91
+    }
+}

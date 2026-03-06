@@ -203,6 +203,8 @@ class GR00TTransform(InvertibleModalityTransform):
                 eagle_conversation, tokenize=False, add_generation_prompt=True
             )
         ]
+        # ["<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n<|im_start|>user\n<image-1>['Pick up the beaker and tilt it to pour out 1 metallic nut into the bowl. Pick up the bowl and place it on the metallic measuring scale.']<|im_end|>\n<|im_start|>assistant\n"]
+        # breakpoint()
         image_inputs, video_inputs = self.eagle_processor.process_vision_info(eagle_conversation)
         eagle_content = {
             "image_inputs": image_inputs,
@@ -216,6 +218,7 @@ class GR00TTransform(InvertibleModalityTransform):
     def _prepare_video(self, data: dict):
         """Process, stack, and pad images from data['video']."""
         ## TODO(YL, FH): check if this is correct
+        # view (number of camera), time, channel, height, width
         images = rearrange(
             data["video"],
             "t v h w c -> v t c h w",
@@ -299,22 +302,59 @@ class GR00TTransform(InvertibleModalityTransform):
         return actions, actions_mask, n_action_tokens
 
     def apply_single(self, data: dict) -> dict:
+        # data.keys()
+        # dict_keys(['annotation.human.action.task_description', 'video', 'state', 'action'])
         transformed_data = {}
 
         # 1) Prepare video and language with vlm processing.
         images = self._prepare_video(data)
-        images = images.astype(np.uint8)
+        images = images.astype(np.uint8) # (1, 1, 3, 224, 224) - view, time, channel, height, width
         language = self._prepare_language(data)
+        # array(['Pick up the beaker and tilt it to pour out 1 metallic nut into the bowl. Pick up the bowl and place it on the metallic measuring scale.'],
+        # dtype='<U135')
         batch_data = {"images": images, "language": language}
         vlm_outputs = self._apply_vlm_processing(batch_data)
-
+        
         # 2) Prepare state
+        #  data['state'].shape: torch.Size([1, 52])
+        #  self.max_state_dim: 64
+        #  state.shape: (1, 64)
+        #  state_mask.shape: (1, 64)
+
+        """
+        The 52 dimensions in the state vector come from the specific configuration of the Fourier GR1 robot arms and hands, combined with a mathematical transformation called Sin-Cos encoding.
+
+        Here is the exact breakdown:
+
+        1. The Raw Joints (26 dimensions)
+        In your FourierGr1ArmsOnlyDataConfig, the state is composed of four groups of joints:
+
+            Left Arm: 7 joints
+            Right Arm: 7 joints
+            Left Hand: 6 joints
+            Right Hand: 6 joints
+            Total: 26 joints
+            2. The Transformation (x2 = 52 dimensions)
+            In gr00t/experiment/data_config.py, the transform method applies StateActionSinCosTransform to the state keys.
+
+            This transform takes every joint angle $\theta$ and converts it into two values: $[\sin(\theta), \cos(\theta)]$.
+
+            26 joints $\times$ 2 values per joint = 52 dimensions.
+            Why do this? Sin-Cos encoding is a common trick in robotics and AI to handle the "wraparound" issue of angles (where $0^\circ$ and $360^\circ$ are the same physical position but different numbers). It provides a continuous representation that is easier for the neural network to learn.
+
+            3. Padded to 64
+            Finally, as you noticed in your debug notes, the model eventually sees a shape of (1, 64). This is because the GR00TTransform takes those 52 real dimensions and pads them with zeros up to the max_state_dim (which is set to 64 in the config) to maintain a consistent input size for the Transformer.
+        """
         state, state_mask, _ = self._prepare_state(data)
         transformed_data["state"] = state
         transformed_data["state_mask"] = state_mask
 
         if self.training:
-            # 3) Prepare actions
+            # 3) Prepare actions - CHUA VERIFY SHAPE
+            #  data['action'].shape: torch.Size([14, 26])
+            #  self.max_action_dim: 26
+            #  actions.shape: (14, 26)
+            #  actions_mask.shape: (14, 26) 
             transformed_data["segmentation_target"] = np.zeros((2,))
             transformed_data["segmentation_target_mask"] = np.zeros((1,))
             transformed_data["has_real_action"] = np.ones((), dtype=bool)
@@ -325,6 +365,39 @@ class GR00TTransform(InvertibleModalityTransform):
         for k, v in vlm_outputs.items():
             assert k not in transformed_data, f"Key {k} already exists in transformed_data."
             transformed_data[k] = v
+        """
+        {'state': array([[ 0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        -1.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+         0.00000000e+00,  1.00000000e+00,  1.00000000e+00,
+         1.00000000e+00, -3.61999008e-06,  1.00000000e+00,
+         1.00000000e+00,  1.00000000e+00,  0.00000000e+00,
+         0.00000000e+00,  0.00000000e+00, -1.00000000e+00,
+         0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+         1.00000000e+00,  1.00000000e+00,  1.00000000e+00,
+        -3.61999008e-06,  1.00000000e+00,  1.00000000e+00,
+         1.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+         0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+         0.00000000e+00,  1.00000000e+00,  1.00000000e+00,
+         1.00000000e+00,  1.00000000e+00,  1.00000000e+00,
+         1.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+         0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+         0.00000000e+00,  1.00000000e+00,  1.00000000e+00,
+         1.00000000e+00,  1.00000000e+00,  1.00000000e+00,
+         1.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+         0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+         0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+         0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+         0.00000000e+00]]), 'state_mask': array([[ True,  True,  True,  True,  True,  True,  True,  True,  True,
+         True,  True,  True,  True,  True,  True,  True,  True,  True,
+         True,  True,  True,  True,  True,  True,  True,  True,  True,
+         True,  True,  True,  True,  True,  True,  True,  True,  True,
+         True,  True,  True,  True,  True,  True,  True,  True,  True,
+         True,  True,  True,  True,  True,  True,  True, False, False,
+        False, False, False, False, False, False, False, False, False,
+        False]]), 'eagle_content': {'image_inputs': [<PIL.Image.Image image mode=RGB size=224x224 at 0x7B782C315250>], 'video_inputs': None, 'text_list': ["<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n<|im_start|>user\n<image-1>['Pick up the beaker and tilt it to pour out 1 metallic nut into the bowl. Pick up the bowl and place it on the metallic measuring scale.']<|im_end|>\n<|im_start|>assistant\n"]}}
+        
+        transformed_data['state'].shape: (1, 64)
+        """
 
         transformed_data["embodiment_id"] = self.get_embodiment_tag()
 

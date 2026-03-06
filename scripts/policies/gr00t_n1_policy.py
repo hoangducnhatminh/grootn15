@@ -14,6 +14,12 @@
 # limitations under the License.
 
 import os
+import sys
+
+# Add the submodule root to sys.path to allow imports from Isaac-GR00T
+submodule_root = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "submodules/Isaac-GR00T")
+if submodule_root not in sys.path:
+    sys.path.append(submodule_root)
 
 from gr00t.experiment.data_config import DATA_CONFIG_MAP
 from gr00t.model.policy import Gr00tPolicy
@@ -32,6 +38,16 @@ class Gr00tN1Policy(PolicyBase):
     def __init__(self, args: Gr00tN1ClosedLoopArguments):
         self.args = args
         self.policy = self._load_policy()
+        if self.args.inference_mode == "tensorrt":
+            from deployment_scripts.trt_model_forward import setup_tensorrt_engines
+            print(f"Setting up TensorRT engines for inference mode: {self.args.inference_mode}...")
+            setup_tensorrt_engines(
+                self.policy, 
+                self.args.trt_engine_path, 
+                self.args.vit_dtype, 
+                self.args.llm_dtype, 
+                self.args.dit_dtype
+            )
         self._load_policy_joints_config()
         self._load_sim_joints_config()
 

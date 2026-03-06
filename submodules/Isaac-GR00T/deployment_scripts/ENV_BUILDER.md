@@ -24,6 +24,37 @@ sudo aptitude install tensorrt=10.1.0.27-1+cuda12.4
 dpkg-query -W tensorrt
 pip list | grep tensorrt
 ```
+## Or you can install using pip
+```
+sudo apt-get install \
+  tensorrt=10.9.0.34-1+cuda12.8 \
+  libnvinfer10=10.9.0.34-1+cuda12.8 \
+  libnvinfer-plugin10=10.9.0.34-1+cuda12.8 \
+  libnvinfer-vc-plugin10=10.9.0.34-1+cuda12.8 \
+  libnvinfer-lean10=10.9.0.34-1+cuda12.8 \
+  libnvinfer-dispatch10=10.9.0.34-1+cuda12.8 \
+  libnvonnxparsers10=10.9.0.34-1+cuda12.8 \
+  libnvinfer-bin=10.9.0.34-1+cuda12.8 \
+  libnvinfer-dev=10.9.0.34-1+cuda12.8 \
+  libnvinfer-lean-dev=10.9.0.34-1+cuda12.8 \
+  libnvinfer-plugin-dev=10.9.0.34-1+cuda12.8 \
+  libnvinfer-vc-plugin-dev=10.9.0.34-1+cuda12.8 \
+  libnvinfer-dispatch-dev=10.9.0.34-1+cuda12.8 \
+  libnvonnxparsers-dev=10.9.0.34-1+cuda12.8 \
+  libnvinfer-headers-dev=10.9.0.34-1+cuda12.8 \
+  libnvinfer-headers-plugin-dev=10.9.0.34-1+cuda12.8 \
+  libnvinfer-samples=10.9.0.34-1+cuda12.8 \
+  python3-libnvinfer=10.9.0.34-1+cuda12.8 \
+  python3-libnvinfer-lean=10.9.0.34-1+cuda12.8 \
+  python3-libnvinfer-dispatch=10.9.0.34-1+cuda12.8 \
+  python3-libnvinfer-dev=10.9.0.34-1+cuda12.8
+```
+
+or:
+```
+sudo apt-get install aptitude
+sudo aptitude install tensorrt=10.9.0.34-1+cuda12.8
+```
 
 ```
 (gr00t) rtx4@vrb-rtx4-pd:~/chinhnt/Isaac-GR00T$ dpkg-query -W tensorrt

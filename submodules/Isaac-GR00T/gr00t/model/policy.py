@@ -169,6 +169,7 @@ class Gr00tPolicy(BasePolicy):
         obs_copy = observations.copy()
 
         is_batch = self._check_state_is_batched(obs_copy)
+
         if not is_batch:
             obs_copy = unsqueeze_dict_values(obs_copy)
 
@@ -178,9 +179,20 @@ class Gr00tPolicy(BasePolicy):
                 obs_copy[k] = np.array(v)
 
         normalized_input = self.apply_transforms(obs_copy)
+        # normalized_input.keys()
+        # dict_keys(['state', 'state_mask', 'eagle_input_ids', 'eagle_attention_mask', 'eagle_pixel_values', 'eagle_image_sizes', 'embodiment_id'])
+        # infer here
+
         normalized_action = self._get_action_from_normalized_input(normalized_input)
         unnormalized_action = self._get_unnormalized_action(normalized_action)
 
+        """
+        It calls unapply_transforms, which uses the same statistics (from metadata.json) that were used to normalize the data in the first place. This ensures that the conversion back to physical units is perfectly consistent with how the model was trained.
+
+        Summary:    
+        Normalization: Converts Radians/Meters -> -1 to 1 (for the AI to "think" better).
+        Unnormalization: Converts -1 to 1 -> Radians/Meters (for the robot to "move" correctly).
+        """
         if not is_batch:
             unnormalized_action = squeeze_dict_values(unnormalized_action)
         return unnormalized_action
@@ -189,7 +201,7 @@ class Gr00tPolicy(BasePolicy):
         # Set up autocast context if needed
         with torch.inference_mode(), torch.autocast(device_type="cuda", dtype=COMPUTE_DTYPE):
             model_pred = self.model.get_action(normalized_input)
-
+        # model_pred['action_pred'].shape: torch.Size([1, 16, 32])
         normalized_action = model_pred["action_pred"].float()
         return normalized_action
 

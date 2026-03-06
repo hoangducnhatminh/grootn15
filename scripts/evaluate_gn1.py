@@ -231,3 +231,11 @@ if __name__ == "__main__":
 
     # Close simulation app after rollout is complete
     simulation_app.close()
+
+
+# python scripts/evaluate_gn1.py     --num_feedback_actions 16     --num_envs 1     --task_name pick_wheel     --eval_file_path ./pick_wheel_standard_r0_trt.json     --model_path /home/minh/Workspace/projects/IsaacLabEvalTasks/submodules/Isaac-GR00T/output_generated_dataset_annotated_gr1_standard_r0/checkpoint-10000     --rollout_length 30     --seed 10     --max_num_rollouts 100     --data_config fourier_gr1_arms_only     --embodiment_tag new_embodiment     --language_instruction "Pick up the beaker and tilt it to pour out 1 metallic nut into the bowl. Pick up the bowl and place it on the metallic measuring scale."     --inference_mode tensorrt     --trt_engine_path /home/minh/Workspace/projects/IsaacLabEvalTasks/gr00t_engine     --vit-dtype fp8     --llm-dtype nvfp4     --dit-dtype fp8 --headless
+
+
+
+
+# python scripts/evaluate_gn1.py     --num_feedback_actions 16     --num_envs 1     --task_name pick_wheel     --eval_file_path ./pick_wheel_standard_r0_trt.json     --model_path /home/minh/Workspace/projects/IsaacLabEvalTasks/submodules/Isaac-GR00T/output_generated_dataset_annotated_gr1_standard_r0/checkpoint-10000     --rollout_length 30     --seed 10     --max_num_rollouts 100     --data_config fourier_gr1_arms_only     --embodiment_tag new_embodiment     --language_instruction "Pick up the beaker and tilt it to pour out 1 metallic nut into the bowl. Pick up the bowl and place it on the metallic measuring scale." --headless

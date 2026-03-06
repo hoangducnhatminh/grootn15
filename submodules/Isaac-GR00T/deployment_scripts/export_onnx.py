@@ -13,6 +13,46 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""
+The 
+export_onnx.py
+ script is the "bridge" between the training environment (PyTorch) and the optimized deployment environment (TensorRT). Its primary job is to take the trained robot "brain" and save it into ONNX files, while also performing Quantization to make the model smaller and faster.
+
+1. The Goal: Modular Export
+The GR00T model is too large to export as a single giant file. Instead, this script breaks it down into several logical components that work together:
+
+- ViT (Vision): The "eyes" that process camera images.
+- LLM (Language): The "reasoning" part that understands instructions.
+- DiT (Action Head): The "hands" that generate the specific motor commands (actions).
+- Encoders/Decoders: Small helpers that translate data between these parts.
+
+2. Quantization (The "Secret Sauce")
+- This script uses a library called modelopt to perform Post-Training Quantization (PTQ). This turns heavy 16-bit numbers (fp16) into lightweight 8-bit (fp8) or even 4-bit (nvfp4) numbers.
+
+- Why? Browsing the code (Lines 842-879), you'll see it supports nvfp4 for the LLM. This makes the model run significantly faster on modern NVIDIA GPUs (like the H100 or L40S) without losing much "intelligence."
+
+3. Smart Calibration (Lines 46-423)
+Unlike simple quantization which might just "guess," this script uses real data to calibrate:
+
+- It looks at actual robot data (using the LeRobotSingleDataset) and feeds it through the model.
+- It records the range of values the model actually produces.
+- It uses these ranges to set the quantization scales precisely, ensuring the robot doesn't become "clumsy" or "confused" after optimization.   
+
+4. Component-Specific logic
+- ViT Export (Lines 960-1100): It actually redefines parts of the Vision Transformer (using 
+SiglipVisionTransformerOpt
+) to make it compatible with ONNX. It adds position_ids as an explicit input to ensure the GPU knows exactly which part of the image it's looking at.
+- LLM Export (Lines 1101-1234): It modifies the Language Model (Qwen3) to remove parts not needed for inference and handles the complex 4-bit (nvfp4) conversion.
+- Action Head Export (Lines 1247-1440): It exports the Diffusion Transformer (DiT). Note that if you choose fp8, it runs a special "denoising loop" during calibration (Lines 448-529) to make sure the movements remain smooth.
+
+5. Accuracy Verification (Lines 715-820)
+After quantizing, the script doesn't just hope for the best. It runs a comparison:
+
+- It feeds the same data into the Original Model and the Quantized Model.
+- It calculates the difference (Cosine Similarity).
+- It prints a summary (Line 797), telling you if the accuracy is "Excellent," "Good," "Acceptable," or "Poor."
+"""
+
 import argparse
 import copy
 import os
@@ -1479,34 +1519,117 @@ def run_groot_inference(
         video_backend_kwargs=None,
         transforms=None,  # We'll handle transforms separately through the policy
     )
+    """
+    step_data.keys()
+    dict_keys(['video.ego_view', 'state.left_arm', 'state.right_arm', 'state.left_hand', 'state.right_hand', 'action.left_arm', 'action.right_arm', 'action.left_hand', 'action.right_hand', 'annotation.human.action.task_description'])
 
+    - step_data['video.ego_view'].shape: (1, 256, 256, 3)
+    - step_data['state.left_arm'].shape: (1, 7)
+    - step_data['state.right_arm'].shape: (1, 7)
+    - step_data['state.left_hand'].shape: (1, 6)
+    - step_data['state.right_hand'].shape: (1, 6)
+    - step_data['action.left_arm'].shape: (16, 7)
+    - step_data['action.right_arm'].shape: (16, 7)
+    - step_data['action.left_hand'].shape: (16, 6)
+    - step_data['action.right_hand'].shape: (16, 6)
+    """
+
+    
     step_data = dataset[0]
     # get the action
     predicted_action = policy.get_action(step_data)
+    # predicted_action.keys(): dict_keys(['action.left_arm', 'action.right_arm', 'action.left_hand', 'action.right_hand'])
+    # predicted_action['action.left_arm'].shape: (16, 7)
+    # predicted_action['action.right_arm'].shape: (16, 7)
+    # predicted_action['action.left_hand'].shape: (16, 6)
+    # predicted_action['action.right_hand'].shape: (16, 6)
 
     attention_mask, state = get_input_info(policy, step_data)
+    # attention_mask.shape: torch.Size([1, 315]) The attention_mask shape [1, 315] represents the total number of tokens (sequence length) that the EAGLE vision-language model processes in a single step.
+
+    """
+    1. Vision Tokens (256 tokens)
+        EAGLE uses a SigLIP vision tower to process camera images.
+
+        The input image is $224 \times 224$ pixels.
+        The model breaks the image into patches of $14 \times 14$ pixels.
+        Total patches $= (224/14) \times (224/14) = 16 \times 16 = \mathbf{256}$ tokens.
+        Even though it's an image, the transformer treats these 256 patches as a sequence of "visual words."
+    2. Text Tokens (~59 tokens)
+        The remaining tokens come from the text prompt and structural overhead. This includes:
+
+        The System Message: "You are a helpful assistant."
+        The User Instruction: "Pick up the beaker and tilt it..."
+        Special Tokens: The ChatML tags like <|im_start|>, <|im_end|>, and the <image-1> placeholder.
+        Generation Prefix: The final <|im_start|>assistant tag that tells the model it's time to generate an action.
+
+    """
+    # state.shape: torch.Size([1, 1, 64])
+
     # export onnx
     os.makedirs(onnx_model_path, exist_ok=True)
     os.makedirs(os.path.join(onnx_model_path, "eagle2"), exist_ok=True)
     os.makedirs(os.path.join(onnx_model_path, "action_head"), exist_ok=True)
 
+    """
+    SiglipVisionTransformer(
+        (embeddings): SiglipVisionEmbeddings(
+            (patch_embedding): Conv2d(3, 1152, kernel_size=(14, 14), stride=(14, 14), padding=valid)
+            (position_embedding): Embedding(256, 1152)
+        )
+        (encoder): SiglipEncoder(
+            (layers): ModuleList(
+            (0-26): 27 x SiglipEncoderLayer(
+                (layer_norm1): LayerNorm((1152,), eps=1e-06, elementwise_affine=True)
+                (self_attn): SiglipAttention(
+                    (k_proj): Linear(in_features=1152, out_features=1152, bias=True)
+                    (v_proj): Linear(in_features=1152, out_features=1152, bias=True)
+                    (q_proj): Linear(in_features=1152, out_features=1152, bias=True)
+                    (out_proj): Linear(in_features=1152, out_features=1152, bias=True)
+                )
+                (layer_norm2): LayerNorm((1152,), eps=1e-06, elementwise_affine=True)
+                (mlp): SiglipMLP(
+                    (activation_fn): PytorchGELUTanh()
+                    (fc1): Linear(in_features=1152, out_features=4304, bias=True)
+                    (fc2): Linear(in_features=4304, out_features=1152, bias=True)
+                )
+            )
+            )
+        )
+        (post_layernorm): LayerNorm((1152,), eps=1e-06, elementwise_affine=True)
+        (head): SiglipMultiheadAttentionPoolingHead(
+            (attention): MultiheadAttention(
+                (out_proj): NonDynamicallyQuantizableLinear(in_features=1152, out_features=1152, bias=True)
+            )
+            (layernorm): LayerNorm((1152,), eps=1e-06, elementwise_affine=True)
+            (mlp): SiglipMLP(
+                (activation_fn): PytorchGELUTanh()
+                (fc1): Linear(in_features=1152, out_features=4304, bias=True)
+                (fc2): Linear(in_features=4304, out_features=1152, bias=True)
+            )
+        )
+    )
+    """
+
     export_eagle2_vit(
         policy.model.backbone.eagle_model.vision_model.vision_model,
         onnx_model_path,
         vit_dtype=vit_dtype,
-        calib_dataset_path=calib_dataset_path or dataset_path,
+        calib_dataset_path=calib_dataset_path or dataset_path, # '/home/minh/Workspace/projects/IsaacLabEvalTasks/dataset/generated_dataset_annotated_gr1_test'
         modality_configs=modality_config,
+        # {'video': ModalityConfig(delta_indices=[0], modality_keys=['video.ego_view']), 'state': ModalityConfig(delta_indices=[0], modality_keys=['state.left_arm', 'state.right_arm', 'state.left_hand', 'state.right_hand']), 'action': ModalityConfig(delta_indices=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], modality_keys=['action.left_arm', 'action.right_arm', 'action.left_hand', 'action.right_hand']), 'language': ModalityConfig(delta_indices=[0], modality_keys=['annotation.human.action.task_description'])}
         embodiment_tag=embodiment_tag,
-        calib_size=calib_size,
+        calib_size=calib_size, # 10
         policy=policy,
-        denoising_steps=denoising_steps,
-        data_config=data_config,
+        denoising_steps=denoising_steps, # 4    
+        data_config=data_config, # 'fourier_gr1_arms_only'
         model_path=model_path,
-        video_backend=video_backend,
+        video_backend=video_backend, # 'decord'
     )
     export_eagle2_llm(
         policy.model.backbone,
         policy.model.config.backbone_cfg,
+        # {'eagle_path': 'NVEagle/eagle_er-qwen3_1_7B-Siglip2_400M_stage1_5_128gpu_er_v7_1mlp_nops', 'load_bf16': False, 'project_to_dim': None, 'reproject_vision': False, 'select_layer': 12, 'tune_llm': False, 'tune_visual': True, 'use_flash_attention': True}
         onnx_model_path,
         attention_mask,
         llm_dtype,
@@ -1519,8 +1642,182 @@ def run_groot_inference(
         data_config=data_config,
         model_path=model_path,
         video_backend=video_backend,
-        full_layer_quant=full_layer_quant,
+        full_layer_quant=full_layer_quant, # False
     )
+    """
+    EagleBackbone(
+        (eagle_model): Eagle2_5_VLForConditionalGeneration(
+            (vision_model): SiglipVisionModel(
+                (vision_model): SiglipVisionTransformer(
+                    (embeddings): SiglipVisionEmbeddings(
+                        (patch_embedding): Conv2d(3, 1152, kernel_size=(14, 14), stride=(14, 14), padding=valid)
+                        (position_embedding): Embedding(256, 1152)
+                    )
+                    (encoder): SiglipEncoder(
+                        (layers): ModuleList(
+                            (0-26): 27 x SiglipEncoderLayer(
+                                (layer_norm1): LayerNorm((1152,), eps=1e-06, elementwise_affine=True)
+                                (self_attn): SiglipAttention(
+                                    (k_proj): Linear(in_features=1152, out_features=1152, bias=True)
+                                    (v_proj): Linear(in_features=1152, out_features=1152, bias=True)
+                                    (q_proj): Linear(in_features=1152, out_features=1152, bias=True)
+                                    (out_proj): Linear(in_features=1152, out_features=1152, bias=True)
+                                )
+                                (layer_norm2): LayerNorm((1152,), eps=1e-06, elementwise_affine=True)
+                                (mlp): SiglipMLP(
+                                    (activation_fn): PytorchGELUTanh()
+                                    (fc1): Linear(in_features=1152, out_features=4304, bias=True)
+                                    (fc2): Linear(in_features=4304, out_features=1152, bias=True)
+                                )
+                            )
+                        )
+                    )
+                    (post_layernorm): LayerNorm((1152,), eps=1e-06, elementwise_affine=True)
+                    (head): SiglipMultiheadAttentionPoolingHead(
+                        (attention): MultiheadAttention(
+                            (out_proj): NonDynamicallyQuantizableLinear(in_features=1152, out_features=1152, bias=True)
+                        )
+                        (layernorm): LayerNorm((1152,), eps=1e-06, elementwise_affine=True)
+                        (mlp): SiglipMLP(
+                            (activation_fn): PytorchGELUTanh()
+                            (fc1): Linear(in_features=1152, out_features=4304, bias=True)
+                            (fc2): Linear(in_features=4304, out_features=1152, bias=True)
+                        )
+                    )
+                )
+            )   
+        )
+        (language_model): Qwen3ForCausalLM(
+            (model): Qwen3Model(
+                (embed_tokens): Embedding(151680, 2048)
+                (layers): ModuleList(
+                    (0-11): 12 x Qwen3DecoderLayer(
+                        (self_attn): Qwen3Attention(
+                            (q_proj): Linear(in_features=2048, out_features=2048, bias=False)
+                            (k_proj): Linear(in_features=2048, out_features=1024, bias=False)
+                            (v_proj): Linear(in_features=2048, out_features=1024, bias=False)
+                            (o_proj): Linear(in_features=2048, out_features=2048, bias=False)
+                            (q_norm): Qwen3RMSNorm((128,), eps=1e-06)
+                            (k_norm): Qwen3RMSNorm((128,), eps=1e-06)
+                        )
+                        (mlp): Qwen3MLP(
+                            (gate_proj): Linear(in_features=2048, out_features=6144, bias=False)
+                            (up_proj): Linear(in_features=2048, out_features=6144, bias=False)
+                            (down_proj): Linear(in_features=6144, out_features=2048, bias=False)
+                            (act_fn): SiLU()
+                        )   
+                        (input_layernorm): Qwen3RMSNorm((2048,), eps=1e-06)
+                        (post_attention_layernorm): Qwen3RMSNorm((2048,), eps=1e-06)
+                    )
+                )
+                (norm): Qwen3RMSNorm((2048,), eps=1e-06)
+                (rotary_emb): Qwen3RotaryEmbedding()
+            )
+            (lm_head): Linear(in_features=2048, out_features=151680, bias=False)
+        )
+        (mlp1): Sequential(
+            (0): Linear(in_features=1152, out_features=2048, bias=True)
+        )
+        (eagle_linear): Identity()
+    )
+    """
+
+    # policy.model.action_head
+    """
+    FlowmatchingActionHead(
+        (model): DiT(
+                (timestep_encoder): TimestepEncoder(
+                    (time_proj): Timesteps()
+                    (timestep_embedder): TimestepEmbedding(
+                        (linear_1): Linear(in_features=256, out_features=1536, bias=True)
+                        (act): SiLU()
+                        (linear_2): Linear(in_features=1536, out_features=1536, bias=True)
+                    )
+                )
+                (transformer_blocks): ModuleList(
+                    (0): BasicTransformerBlock(
+                        (norm1): AdaLayerNorm(
+                        (silu): SiLU()
+                            (linear): Linear(in_features=1536, out_features=3072, bias=True)
+                            (norm): LayerNorm((1536,), eps=1e-05, elementwise_affine=False)
+                        )
+                        (attn1): Attention(
+                            (to_q): Linear(in_features=1536, out_features=1536, bias=True)
+                            (to_k): Linear(in_features=2048, out_features=1536, bias=True)
+                            (to_v): Linear(in_features=2048, out_features=1536, bias=True)
+                            (to_out): ModuleList(
+                                (0): Linear(in_features=1536, out_features=1536, bias=True)
+                                (1): Dropout(p=0.2, inplace=False)
+                            )
+                        )
+                        (norm3): LayerNorm((1536,), eps=1e-05, elementwise_affine=False)
+                        (ff): FeedForward(
+                            (net): ModuleList(
+                                (0): GELU(
+                                    (proj): Linear(in_features=1536, out_features=6144, bias=True)
+                                )
+                                (1): Dropout(p=0.2, inplace=False)
+                                (2): Linear(in_features=6144, out_features=1536, bias=True)
+                                (3): Dropout(p=0.2, inplace=False)
+                            )
+                        )
+                        (final_dropout): Dropout(p=0.2, inplace=False)
+                    )
+                    ...
+                    (15): BasicTransformerBlock(
+                        ...)
+                )
+                (norm_out): LayerNorm((1536,), eps=1e-06, elementwise_affine=False)
+                (proj_out_1): Linear(in_features=1536, out_features=3072, bias=True)
+                (proj_out_2): Linear(in_features=1536, out_features=1024, bias=True)
+        )
+        (state_encoder): CategorySpecificMLP(
+            (layer1): CategorySpecificLinear()
+            (layer2): CategorySpecificLinear()
+        )
+        (action_encoder): MultiEmbodimentActionEncoder(
+            (W1): CategorySpecificLinear()
+            (W2): CategorySpecificLinear()
+            (W3): CategorySpecificLinear()
+            (pos_encoding): SinusoidalPositionalEncoding()
+        )
+        (action_decoder): CategorySpecificMLP(
+            (layer1): CategorySpecificLinear()
+            (layer2): CategorySpecificLinear()
+        )
+        (future_tokens): Embedding(32, 1536)
+        (vlln): LayerNorm((2048,), eps=1e-05, elementwise_affine=True)
+        (vl_self_attention): SelfAttentionTransformer(
+            (transformer_blocks): ModuleList(
+            (0-3): 4 x BasicTransformerBlock(
+                (norm1): LayerNorm((2048,), eps=1e-05, elementwise_affine=True)
+                (attn1): Attention(
+                    (to_q): Linear(in_features=2048, out_features=2048, bias=True)
+                    (to_k): Linear(in_features=2048, out_features=2048, bias=True)
+                    (to_v): Linear(in_features=2048, out_features=2048, bias=True)
+                    (to_out): ModuleList(
+                        (0): Linear(in_features=2048, out_features=2048, bias=True)
+                        (1): Dropout(p=0.2, inplace=False)
+                    )
+                )
+                (norm3): LayerNorm((2048,), eps=1e-05, elementwise_affine=True)
+                (ff): FeedForward(
+                    (net): ModuleList(
+                        (0): GELU(
+                            (proj): Linear(in_features=2048, out_features=8192, bias=True)
+                        )
+                        (1): Dropout(p=0.2, inplace=False)
+                        (2): Linear(in_features=8192, out_features=2048, bias=True)
+                        (3): Dropout(p=0.2, inplace=False)
+                    )
+                )
+                (final_dropout): Dropout(p=0.2, inplace=False)
+            )
+            )
+        )
+        (position_embedding): Embedding(1024, 1536)
+        )
+    """
     export_action_head(
         policy,
         onnx_model_path,
@@ -1547,7 +1844,7 @@ if __name__ == "__main__":
         "--dataset-path",
         type=str,
         help="Path to the dataset",
-        default=os.path.join(os.getcwd(), "demo_data/robot_sim.PickNPlace"),
+        default=os.path.join(os.getcwd(), "dataset/generated_dataset_annotated_gr1_test"),
     )
     parser.add_argument(
         "--model-path",
@@ -1574,7 +1871,7 @@ if __name__ == "__main__":
         "--embodiment-tag",
         type=str,
         help="The embodiment tag for the model (e.g. gr1, g1, so100, etc.)",
-        default="gr1",
+        default="new_embodiment",
     )
 
     parser.add_argument(

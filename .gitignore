@@ -28,7 +28,8 @@
 **/.neptune/*
 docker/artifacts/
 *.tmp
-
+gr00t_engine/
+gr00t_onnx/
 # Isaac-Sim packman
 _isaac_sim*
 _repo
